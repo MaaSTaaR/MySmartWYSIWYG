@@ -11,6 +11,36 @@
 		return this.editorDoc;
 	}
 	
+	this.getSelectionLines = function()
+	{
+		var selection = getEditorDoc().getSelection();
+		var range = selection.getRangeAt( 0 );
+		
+		var text = selection.toString();
+		
+		return text.split( "\n" );
+	}
+	
+	this.addTagToText = function( textLines, tag )
+	{
+		var newContainer = getEditorDoc().createElement( "span" );
+		
+		newContainer.appendChild( document.createTextNode( "[" + tag + "]" ) );
+		newContainer.appendChild( document.createElement( "br" ) );
+		
+		var lines = textLines;
+		
+		for ( var k = 0; k < lines.length; k++ )
+		{
+			newContainer.appendChild( document.createTextNode( lines[ k ] ) );
+			newContainer.appendChild( document.createElement( "br" ) );
+		}
+		
+		newContainer.appendChild( document.createTextNode( "[/" + tag + "]" ) );
+		
+		getEditorDoc().execCommand( "insertHTML", false, newContainer.innerHTML );
+	}
+	
 	this.initEditor = function( parent )
 	{
 		initToolbar( parent );
@@ -94,53 +124,12 @@
 		
 		$( ".code" ).on( "click", function() 
 		{
-			var selection = getEditorDoc().getSelection();
-			var range = selection.getRangeAt( 0 );
-			
-			var text = selection.toString();
-			
-			var codeContainer = getEditorDoc().createElement( "span" );
-			
-			codeContainer.appendChild( document.createTextNode( "[code]" ) );
-			codeContainer.appendChild( document.createElement( "br" ) );
-			
-			var lines = text.split( "\n" );
-			
-			for ( var k = 0; k < lines.length; k++ )
-			{
-				codeContainer.appendChild( document.createTextNode( lines[ k ] ) );
-				codeContainer.appendChild( document.createElement( "br" ) );
-			}
-			
-			codeContainer.appendChild( document.createTextNode( "[/code]" ) );
-			
-			getEditorDoc().execCommand( "insertHTML", false, codeContainer.innerHTML );
-			
+			addTagToText( getSelectionLines(), "code" );
 		} );
 		
 		$( ".quote" ).on( "click", function() 
-		{ 			
-			var selection = getEditorDoc().getSelection();
-			var range = selection.getRangeAt( 0 );
-			
-			var text = selection.toString();
-			
-			var codeContainer = getEditorDoc().createElement( "span" );
-			
-			codeContainer.appendChild( document.createTextNode( "[quote]" ) );
-			codeContainer.appendChild( document.createElement( "br" ) );
-			
-			var lines = text.split( "\n" );
-			
-			for ( var k = 0; k < lines.length; k++ )
-			{
-				codeContainer.appendChild( document.createTextNode( lines[ k ] ) );
-				codeContainer.appendChild( document.createElement( "br" ) );
-			}
-			
-			codeContainer.appendChild( document.createTextNode( "[/quote]" ) );
-			
-			getEditorDoc().execCommand( "insertHTML", false, codeContainer.innerHTML );
+		{
+			addTagToText( getSelectionLines(), "quote" );
 		} );
 		
 		$( "#font_family" ).on( "change", function() 
