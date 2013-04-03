@@ -1,5 +1,6 @@
 (function( $ ) {
 	var editorDoc;
+	var commands = [];
 	
 	$.fn.MySmartEditor = function() 
 	{
@@ -11,7 +12,7 @@
 		return this.editorDoc;
 	}
 	
-	this.getSelectionLines = function()
+	this.getSelectedLines = function()
 	{
 		var selection = getEditorDoc().getSelection();
 		var range = selection.getRangeAt( 0 );
@@ -43,9 +44,104 @@
 	
 	this.initEditor = function( parent )
 	{
+		initCommandsList();
 		initToolbar( parent );
 		initWorkingSpace( parent );
 		implementToolbarCommands();
+	}
+	
+	this.initCommandsList = function()
+	{
+		var k = 0;
+		
+		commands[ k++ ] = { name: "Bold",
+							type: "cmd",
+							css_class: "bold",
+							callback: function() 
+							{
+								getEditorDoc().execCommand( 'bold', false, null );
+							} };
+		
+		commands[ k++ ] = { name: "Italic",
+							type: "cmd",
+							css_class: "italic",
+							callback: function() 
+							{
+								getEditorDoc().execCommand( 'italic', false, null );
+							} };
+		
+		commands[ k++ ] = { name: "Underline",
+							type: "cmd",
+							css_class: "underline",
+							callback: function() 
+							{
+								getEditorDoc().execCommand( 'underline', false, null );
+							} };
+		
+		commands[ k++ ] = { type: "seperator" };
+		
+		commands[ k++ ] = { name: "Link",
+							type: "cmd",
+							css_class: "link",
+							callback: function() 
+							{
+								// TODO
+							} };
+		
+		commands[ k++ ] = { name: "Image",
+							type: "cmd",
+							css_class: "image",
+							callback: function() 
+							{
+								// TODO
+							} };
+		
+		commands[ k++ ] = { type: "seperator" };
+		
+		commands[ k++ ] = { name: "Code",
+							type: "cmd",
+							css_class: "code",
+							callback: function() 
+							{
+								addTagToText( getSelectedLines(), "code" );
+							} };
+		
+		commands[ k++ ] = { name: "Quote",
+							type: "cmd",
+							css_class: "quote",
+							callback: function() 
+							{
+								addTagToText( getSelectedLines(), "quote" );
+							} };
+
+		commands[ k++ ] = { type: "seperator" };
+		
+		commands[ k++ ] = { name: "Font Family",
+							type: "list",
+							id: "font_family",
+							callback: function( parent ) 
+							{
+								getEditorDoc().execCommand( 'fontName', false, parent.val() );
+							},
+							insertData: function() { }};
+		
+		commands[ k++ ] = { 	name: "Font Color",
+								type: "list",
+								id: "font_color",
+								callback: function( parent ) 
+								{
+									getEditorDoc().execCommand( 'foreColor', false, parent.val() );
+								},
+								insertData: function() { }};
+		
+		commands[ k++ ] = { 	name: "Font Size",
+								type: "list",
+								id: "font_size",
+								callback: function( parent ) 
+								{
+									getEditorDoc().execCommand( 'fontSize', false, parent.val() );
+								},
+								insertData: function() { }};
 	}
 	
 	this.initToolbar = function( parent )
@@ -56,7 +152,27 @@
 		
 		$( "#toolbar_option" ).hide();
 		
-		$( "#toolbar ul" ).append( '<li class="bold cmd"></li>' );
+		for ( var k = 0; k < commands.length; k++ )
+		{
+			var command = commands[ k ];
+			
+			if ( command.type == "cmd" )
+			{
+				$( "#toolbar ul" ).append( '<li class="' + command.css_class + ' cmd"></li>' );
+			}
+			else if ( command.type == "list" )
+			{
+				$( "#toolbar ul" ).append( '<li class="list"><select name="' + command.id + '_n" id="' + command.id + '"></select></li>' );
+				
+				command.insertData();
+			}
+			else
+			{
+				$( "#toolbar ul" ).append( '<li class="seperator"></li>' );
+			}
+		}
+		
+		/*$( "#toolbar ul" ).append( '<li class="bold cmd"></li>' );
 		$( "#toolbar ul" ).append( '<li class="italic cmd"></li>' );
 		$( "#toolbar ul" ).append( '<li class="underline cmd"></li>' );
 		$( "#toolbar ul" ).append( '<li class="seperator"></li>' );
@@ -69,6 +185,7 @@
 		$( "#toolbar ul" ).append( '<li class="list"><select name="font_family_n" id="font_family"><option selected="selected" value="fontfamily_title">Font-family</option><option value="Arial">Arial</option><option value="Tahoma">Tahoma</option></select></li>' );
 		$( "#toolbar ul" ).append( '<li class="list"><select name="font_color_n" id="font_color"><option selected="selected" value="fontcolor_title">Font-color</option><option value="#ff0000" style="color: #ff0000;">Red</option><option value="#0000ff" style="color: #0000ff;">Blue</option></select></li>' );
 		$( "#toolbar ul" ).append( '<li class="list"><select name="font_size_n" id="font_size"><option selected="selected" value="fontsize_title">Font-size</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></li>' );
+		*/
 	}
 	
 	this.initWorkingSpace = function( parent )
@@ -124,12 +241,12 @@
 		
 		$( ".code" ).on( "click", function() 
 		{
-			addTagToText( getSelectionLines(), "code" );
+			addTagToText( getSelectedLines(), "code" );
 		} );
 		
 		$( ".quote" ).on( "click", function() 
 		{
-			addTagToText( getSelectionLines(), "quote" );
+			addTagToText( getSelectedLines(), "quote" );
 		} );
 		
 		$( "#font_family" ).on( "change", function() 
