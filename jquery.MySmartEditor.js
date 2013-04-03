@@ -123,25 +123,43 @@
 							{
 								getEditorDoc().execCommand( 'fontName', false, parent.val() );
 							},
-							insertData: function() { }};
+							insertData: function() 
+							{ 
+								$( "#font_family" ).append( '<option selected="selected" value="fontfamily_title">Font-family</option>' );
+								$( "#font_family" ).append( '<option value="Arial">Arial</option>' );
+								$( "#font_family" ).append( '<option value="Tahoma">Tahoma</option>' );
+							}};
 		
-		commands[ k++ ] = { 	name: "Font Color",
-								type: "list",
-								id: "font_color",
-								callback: function( parent ) 
-								{
-									getEditorDoc().execCommand( 'foreColor', false, parent.val() );
-								},
-								insertData: function() { }};
+		commands[ k++ ] = { name: "Font Color",
+							type: "list",
+							id: "font_color",
+							callback: function( parent ) 
+							{
+								getEditorDoc().execCommand( 'foreColor', false, parent.val() );
+							},
+							insertData: function() 
+							{ 
+								$( "#font_color" ).append( '<option selected="selected" value="fontcolor_title">Font-color</option>' );
+								$( "#font_color" ).append( '<option value="#ff0000" style="color: #ff0000;">Red</option>' );
+								$( "#font_color" ).append( '<option value="#0000ff" style="color: #0000ff;">Blue</option>' );
+							}};
 		
-		commands[ k++ ] = { 	name: "Font Size",
-								type: "list",
-								id: "font_size",
-								callback: function( parent ) 
-								{
-									getEditorDoc().execCommand( 'fontSize', false, parent.val() );
-								},
-								insertData: function() { }};
+		commands[ k++ ] = { name: "Font Size",
+							type: "list",
+							id: "font_size",
+							callback: function( parent ) 
+							{
+								getEditorDoc().execCommand( 'fontSize', false, parent.val() );
+							},
+							insertData: function() 
+							{ 
+								$( "#font_size" ).append( '<option selected="selected" value="fontsize_title">Font-size</option>' );
+								$( "#font_size" ).append( '<option value="1">1</option>' );
+								$( "#font_size" ).append( '<option value="2">2</option>' );
+								$( "#font_size" ).append( '<option value="3">3</option>' );
+								$( "#font_size" ).append( '<option value="4">4</option>' );
+								$( "#font_size" ).append( '<option value="5">5</option>' );
+							}};
 	}
 	
 	this.initToolbar = function( parent )
@@ -159,33 +177,28 @@
 			if ( command.type == "cmd" )
 			{
 				$( "#toolbar ul" ).append( '<li class="' + command.css_class + ' cmd"></li>' );
+				
+				$( "." + command.css_class ).on( 'click', command.callback );
 			}
 			else if ( command.type == "list" )
 			{
 				$( "#toolbar ul" ).append( '<li class="list"><select name="' + command.id + '_n" id="' + command.id + '"></select></li>' );
 				
 				command.insertData();
+				
+				$( "#" + command.id ).on( 'change',
+						function() 
+						{
+							command.callback( $( this ) );
+							
+							$( this ).prop( "selectedIndex", 0 ); 
+						} );
 			}
 			else
 			{
 				$( "#toolbar ul" ).append( '<li class="seperator"></li>' );
 			}
 		}
-		
-		/*$( "#toolbar ul" ).append( '<li class="bold cmd"></li>' );
-		$( "#toolbar ul" ).append( '<li class="italic cmd"></li>' );
-		$( "#toolbar ul" ).append( '<li class="underline cmd"></li>' );
-		$( "#toolbar ul" ).append( '<li class="seperator"></li>' );
-		$( "#toolbar ul" ).append( '<li class="link cmd"></li>' );
-		$( "#toolbar ul" ).append( '<li class="image cmd"></li>' )
-		$( "#toolbar ul" ).append( '<li class="seperator"></li>' );;
-		$( "#toolbar ul" ).append( '<li class="code cmd"></li>' );
-		$( "#toolbar ul" ).append( '<li class="quote cmd"></li>' );
-		$( "#toolbar ul" ).append( '<li class="seperator"></li>' );;
-		$( "#toolbar ul" ).append( '<li class="list"><select name="font_family_n" id="font_family"><option selected="selected" value="fontfamily_title">Font-family</option><option value="Arial">Arial</option><option value="Tahoma">Tahoma</option></select></li>' );
-		$( "#toolbar ul" ).append( '<li class="list"><select name="font_color_n" id="font_color"><option selected="selected" value="fontcolor_title">Font-color</option><option value="#ff0000" style="color: #ff0000;">Red</option><option value="#0000ff" style="color: #0000ff;">Blue</option></select></li>' );
-		$( "#toolbar ul" ).append( '<li class="list"><select name="font_size_n" id="font_size"><option selected="selected" value="fontsize_title">Font-size</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></li>' );
-		*/
 	}
 	
 	this.initWorkingSpace = function( parent )
@@ -211,7 +224,7 @@
 	
 	this.implementToolbarCommands = function()
 	{
-		$( ".bold" ).on( "click", function() { getEditorDoc().execCommand( 'bold', false, null ); } );
+		/*$( ".bold" ).on( "click", function() { getEditorDoc().execCommand( 'bold', false, null ); } );
 		$( ".italic" ).on( "click", function() { getEditorDoc().execCommand( 'italic', false, null ); } );
 		$( ".underline" ).on( "click", function() { getEditorDoc().execCommand( 'underline', false, null ); } );
 		$( ".link" ).on( "click", function() 
@@ -273,6 +286,6 @@
 		$( "#show_html" ).on( "click", function() 
 		{ 
 			alert( getEditorDoc().body.innerHTML );
-		} );
+		} );*/
 	}
 })(jQuery);
