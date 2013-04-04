@@ -119,9 +119,9 @@
 		commands[ k++ ] = { name: "Font Family",
 							type: "list",
 							id: "font_family",
-							callback: function( parent ) 
+							callback: function( val ) 
 							{
-								getEditorDoc().execCommand( 'fontName', false, parent.val() );
+								getEditorDoc().execCommand( 'fontName', false, val );
 							},
 							insertData: function() 
 							{ 
@@ -133,9 +133,9 @@
 		commands[ k++ ] = { name: "Font Color",
 							type: "list",
 							id: "font_color",
-							callback: function( parent ) 
+							callback: function( val ) 
 							{
-								getEditorDoc().execCommand( 'foreColor', false, parent.val() );
+								getEditorDoc().execCommand( 'foreColor', false, val );
 							},
 							insertData: function() 
 							{ 
@@ -147,9 +147,9 @@
 		commands[ k++ ] = { name: "Font Size",
 							type: "list",
 							id: "font_size",
-							callback: function( parent ) 
+							callback: function( val ) 
 							{
-								getEditorDoc().execCommand( 'fontSize', false, parent.val() );
+								getEditorDoc().execCommand( 'fontSize', false, val );
 							},
 							insertData: function() 
 							{ 
@@ -173,7 +173,7 @@
 		for ( var k = 0; k < commands.length; k++ )
 		{
 			var command = commands[ k ];
-			
+						
 			if ( command.type == "cmd" )
 			{
 				$( "#toolbar ul" ).append( '<li class="' + command.css_class + ' cmd"></li>' );
@@ -186,10 +186,12 @@
 				
 				command.insertData();
 				
-				$( "#" + command.id ).on( 'change',
-						function() 
+				$( "#" + command.id ).on( 'change', command,
+						function( event ) 
 						{
-							command.callback( $( this ) );
+							var cmd = event.data;
+							
+							cmd.callback( $( this ).val() );
 							
 							$( this ).prop( "selectedIndex", 0 ); 
 						} );
