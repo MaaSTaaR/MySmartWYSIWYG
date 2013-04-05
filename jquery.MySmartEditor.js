@@ -42,12 +42,25 @@
 		getEditorDoc().execCommand( "insertHTML", false, newContainer.innerHTML );
 	}
 	
+	this.showOption = function( html, btnID, callback )
+	{
+		$( "#option_content" ).remove();
+		$( "#toolbar_option" ).append( '<span id="option_content">' + html + '</span>' );
+		$( "#toolbar_option" ).fadeToggle(); 
+		
+		$( "#" + btnID ).on( "click", function() 
+		{
+			callback();
+			
+			$( "#toolbar_option" ).fadeToggle( 400, "swing", function() { $( "#option_content" ).remove(); } );
+		});
+	}
+	
 	this.initEditor = function( parent )
 	{
 		initCommandsList();
 		initToolbar( parent );
 		initWorkingSpace( parent );
-		implementToolbarCommands();
 	}
 	
 	this.initCommandsList = function()
@@ -83,17 +96,37 @@
 		commands[ k++ ] = { name: "Link",
 							type: "cmd",
 							css_class: "link",
-							callback: function() 
+							option: true,
+							callback: function( event ) 
 							{
-								// TODO
+								var me = event.data;
+								
+								var btnID = 'insert_link';
+								var html = 'Link : <input type="text" id="link" /><input type="button" id="insert_link" value="Insert">';
+								
+								showOption( html, btnID, me.optionCallback );
+							},
+							optionCallback: function()
+							{
+								getEditorDoc().execCommand( 'createlink', false, $( "#link" ).val() );
 							} };
 		
 		commands[ k++ ] = { name: "Image",
 							type: "cmd",
 							css_class: "image",
-							callback: function() 
+							option: true,
+							callback: function( event ) 
 							{
-								// TODO
+								var me = event.data;
+								
+								var btnID = 'insert_image';
+								var html = 'Image\'s Link : <input type="text" id="link" /><input type="button" id="' + btnID + '" value="Insert">';
+								
+								showOption( html, btnID, me.optionCallback );
+							},
+							optionCallback: function()
+							{
+								getEditorDoc().execCommand( 'insertImage', false, $( "#link" ).val() );
 							} };
 		
 		commands[ k++ ] = { type: "seperator" };
@@ -178,7 +211,12 @@
 			{
 				$( "#toolbar ul" ).append( '<li class="' + command.css_class + ' cmd"></li>' );
 				
-				$( "." + command.css_class ).on( 'click', command.callback );
+				var data = null;
+				
+				if ( command.option )
+					data = command;
+				
+				$( "." + command.css_class ).on( 'click', data, command.callback );
 			}
 			else if ( command.type == "list" )
 			{
@@ -222,72 +260,5 @@
 		this.editorDoc.close();
 		
 		element.contentWindow.focus();
-	}
-	
-	this.implementToolbarCommands = function()
-	{
-		/*$( ".bold" ).on( "click", function() { getEditorDoc().execCommand( 'bold', false, null ); } );
-		$( ".italic" ).on( "click", function() { getEditorDoc().execCommand( 'italic', false, null ); } );
-		$( ".underline" ).on( "click", function() { getEditorDoc().execCommand( 'underline', false, null ); } );
-		$( ".link" ).on( "click", function() 
-		{
-			$( "#option_content" ).remove();
-			$( "#toolbar_option" ).append( '<span id="option_content">Link : <input type="text" id="link" /><input type="button" id="insert_link" value="Insert"></span>' );
-			$( "#toolbar_option" ).fadeToggle(); 
-			
-			$( "#insert_link" ).on( "click", function() {
-				getEditorDoc().execCommand( 'createlink', false, $( "#link" ).val() );
-				$( "#toolbar_option" ).fadeToggle( 400, "swing", function() { $( "#option_content" ).remove(); } );
-			});
-		} );
-		
-		$( ".image" ).on( "click", function() 
-		{ 
-			$( "#option_content" ).remove();
-			$( "#toolbar_option" ).append( '<span id="option_content">Image\'s Link : <input type="text" id="link" /><input type="button" id="insert_image" value="Insert"></span>' );
-			$( "#toolbar_option" ).fadeToggle(); 
-		
-			$( "#insert_image" ).on( "click", function() {
-				getEditorDoc().execCommand( 'insertImage', false, $( "#link" ).val() );
-
-				$( "#toolbar_option" ).fadeToggle( 400, "swing", function() { $( "#option_content" ).remove(); } );
-			});
-		} );
-		
-		$( ".code" ).on( "click", function() 
-		{
-			addTagToText( getSelectedLines(), "code" );
-		} );
-		
-		$( ".quote" ).on( "click", function() 
-		{
-			addTagToText( getSelectedLines(), "quote" );
-		} );
-		
-		$( "#font_family" ).on( "change", function() 
-		{
-			getEditorDoc().execCommand( 'fontName', false, $( this ).val() );
-			
-			$( "#font_family" ).prop( "selectedIndex", 0 );
-		});
-		
-		$( "#font_color" ).on( "change", function() 
-		{
-			getEditorDoc().execCommand( 'foreColor', false, $( this ).val() );
-			
-			$( "#font_color" ).prop( "selectedIndex", 0 );
-		});
-		
-		$( "#font_size" ).on( "change", function() 
-		{
-			getEditorDoc().execCommand( 'fontSize', false, $( this ).val() );
-			
-			$( "#font_size" ).prop( "selectedIndex", 0 );
-		});
-		
-		$( "#show_html" ).on( "click", function() 
-		{ 
-			alert( getEditorDoc().body.innerHTML );
-		} );*/
 	}
 })(jQuery);
